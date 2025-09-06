@@ -14,27 +14,66 @@
 #include<cstring>
 #include<string>
 #include<math.h>
+#include<sstream>
 
 using namespace std;
 
-/* 
- * A server - socket -> bind -> listen -> accept -> read/write -> close
- *
- * A client - socket -> connect ->read/write -> close
- *
- */
-
+// CONFIGURATIONS
 #define NUM_THREADS 4
-int SERVER_PORT_NUMBER = 8081;
+int SERVER_PORT_NUMBER = 8091;
 int CONNECTION_NUMBER = 5;
-int NEIGHBOR_PORT_NUMBER = 8082;
+int NEIGHBOR_PORT_NUMBER = 8092;
 string NEIGHBOR_SERVER_IP = "127.0.0.1";
+string SELF_IP = "127.0.0.1";
 bool source = false;
-condition_variable queue_empty, queue_full;
-string secret = "thor";
+string secret = "Mjnolir";
+int HOP_COUNT = 5;
+
+struct Message{
+	string content;
+	int hop_count;
+	string source_ip;
+	string destination_ip;
+	int destination_port_number;
+
+	Message() : content(""), hop_count(0), source_ip(""), destination_ip(""), destination_port_number(-1) {}
+
+	Message(string content, int hop_count, string source_ip, string destination_ip, int destination_port_number){
+		this->content = content;
+		this->hop_count = hop_count;
+		this->source_ip = source_ip;
+		this->destination_ip = destination_ip;
+		this->destination_port_number = destination_port_number;
+	}
+
+	string serialize(){
+		return content + "#" + to_string(hop_count) + "#" + source_ip + "#" + destination_ip + "#" + to_string(destination_port_number);
+	}
+
+	static Message deserialize(const string& message){
+		stringstream ss(message);
+		vector<string> tokens;
+		const char delimiter = '#';
+		string item;
+		while(getline(ss, item, delimiter)){
+			tokens.push_back(item);
+		}
+		if(tokens.size() != 5){
+			perror("Wrong message format!");
+		}
+
+		string content = tokens[0];
+		int hop_count = stoi(tokens[1]);
+		string src_ip = tokens[2];
+		string dest_ip = tokens[3];
+		int destination_port_number = stoi(tokens[4]);
+
+		return Message(content, hop_count, src_ip, dest_ip, destination_port_number);
+	}
+};
 
 
-
+// CLIENT
 class Client{
 public:
 	int client_fd;
@@ -76,9 +115,9 @@ public:
 
 	}
 	
-	string send_request(string msg){
-		const char* message = msg.c_str();
-		if(write(client_fd, message, strlen(message)) < 0){
+	string send_request(Message msg){
+		string res = msg.serialize();
+		if(write(client_fd, res.c_str(), res.size()) < 0){
 			perror("Write failed!");
 			close(client_fd);
 		}
@@ -94,25 +133,29 @@ public:
 	}
 };
 
-
+// FOR THREADS TO ACCEPT CONNECTIONS AND ASSOCIATE THE CONNECTION_FD
 struct Task{
     int connection_id;
     struct sockaddr_in address;
-    string request;
+    Message request;
     Task() : connection_id(-1), address{}, request{} {}
 
-    Task(int connection_id, struct sockaddr_in address, string request){
+    Task(int connection_id, struct sockaddr_in address, Message request){
         this->connection_id = connection_id;
         this->address = address;
         this->request = request;
     }
 };
 
+// LOCKING MECHANISM
 mutex queue_mutex;
 queue<Task> tasks;
 int capacity = 10;
-bool kill_switch = false; //unused as of now
+bool kill_switch = false; //TODO: SHUTDOWN NEEDS TO BE CONFIGURED
+condition_variable queue_empty, queue_full;
 
+
+//MULTITHREADED SERRVER IMPLEMENTATION WITH AN ACCEPT QUEUE
 class Server{
 public: 
     int port, connections;
@@ -132,6 +175,12 @@ public:
         address.sin_addr.s_addr = INADDR_ANY;
         address.sin_port = htons(this->port);
         socklen_t addrlen = sizeof(address);
+
+        int opt = 1;
+		if (setsockopt(this->server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
+		    perror("setsockopt(SO_REUSEADDR) failed");
+		}
+
         
         if(bind(this->server_fd, (struct sockaddr*)&address, addrlen) < 0){
             perror("Socket binding failed");
@@ -142,26 +191,27 @@ public:
     	if(listen(this->server_fd, this->connections) < 0){
             perror("Listening failed!");
         }
-        cout<<"Server listening at "<<this->port<<endl;
+        cout<<"[INFO] : Server listening at "<<this->port<<endl;
 
         while(true){
             struct sockaddr_in new_address;
             socklen_t new_addr_len = sizeof(new_address);
             int new_conn = accept(this->server_fd, (struct sockaddr*)&new_address, &new_addr_len);
-            cout<<"New connection established!"<<endl;
+            cout<<"[INFO] : New connection established!"<<endl; //TODO: ADD IP INFORMATION
 
             char buffer[1024] = {0};
-
             int n = read(new_conn, buffer, 1024);
-            
             if(n > 0){
                 buffer[n] = '\0';
             }else{
                 perror("Reading from client failed!");
             }
-            cout<<"[CLIENT] "<<buffer<<endl;
+            cout<<"[CLIENT] : Looking for "<<buffer<<endl; // TODO: ADD IP INFOMRATION
 	    	string request(buffer);
-            Task task(new_conn, new_address, request);
+
+	    	Message msg = Message::deserialize(request);
+
+            Task task(new_conn, new_address, msg);
             {
                 unique_lock<mutex> lock(queue_mutex);
                 queue_full.wait(lock, []{
@@ -169,7 +219,7 @@ public:
                 });
                 tasks.push(task);
             }
-        	queue_empty.notify_one(); // how do you ensure thread rotation?
+	    	queue_empty.notify_one(); // QUESTIONS: How do you ensure thread rotation?
         }
     }
 };
@@ -187,39 +237,44 @@ void executeTask(){
 			Task new_task = tasks.front();
 			task = new_task;			
 			tasks.pop();
-
 		}
 		queue_full.notify_one();
 		
-		// think about the connection descriptors - assumption - all are using different file descriptors - is there any other case?
+		// QUESTIONS: think about the connection descriptors - assumption - all are using different file descriptors - is there any other case?
 		int connection_id = task.connection_id;
-		string request = task.request;
-		cout<<"Read request inside thread: "<<request<<endl;
-		if(request == secret){
-    			const char* successMessage = "Success";
-			write(connection_id, successMessage, strlen(successMessage));
+		Message request = task.request;
+		cout<<"[INFO] : Read request inside thread from the client: "<<request.content<<endl; //TODO: ADD THREAD_ID
+		
+		// DECREMENTING HOP COUNT
+		request.hop_count  -= 1;
+
+		const string successMessage = "Success";
+		const string errorMessage = "Not found";
+
+		// IF THE CURRET SERVER HAS THE MESSAGE, THEN SET CONTENT TO SUCCESS AND SEND IT BACK
+		if(request.content == secret){
+			Message msg(successMessage, request.hop_count, request.source_ip, SELF_IP, SERVER_PORT_NUMBER);
+			string response = msg.serialize();
+			write(connection_id, response.c_str(), response.size());
+
+		// ELSE CHECK THE MESSAGES HOP COUNT, IF THE HOP_COUNT = 0, SET NOT FOUND AND RETURN, ELSE CREATE A NEW CLIENT 
+		// AND SEND A REQUEST TO THE NEIGHBOR AND FORWARD THE RESPONSE BACK TO THE CLIENT MAKING THE REQUEST.	
 		}else{
-			string probe = request;
-			Client client(NEIGHBOR_PORT_NUMBER, NEIGHBOR_SERVER_IP);
-			client.start_connection();
-			string response = client.send_request(probe);
-			if(response == "Success"){
-				const char* successMessage = "Success";
-				write(connection_id, successMessage, strlen(successMessage));
+			if(request.hop_count != 0){
+				Client client(NEIGHBOR_PORT_NUMBER, NEIGHBOR_SERVER_IP);
+				client.start_connection();
+				string response = client.send_request(request);
+				write(connection_id, response.c_str(), response.size());
 			}else{
-				const char* errorMessage = "Not found";
-				write(connection_id, errorMessage, strlen(errorMessage));
-						
-			}
-			
-			
+				Message msg(errorMessage, request.hop_count, request.source_ip, SELF_IP, SERVER_PORT_NUMBER);
+				string response = msg.serialize();
+				write(connection_id, response.c_str(), response.size());				
+			}	
 		}
 		close(connection_id);
 	}
 
 }
-
-
 
 void start_server(){
 	Server server(SERVER_PORT_NUMBER, CONNECTION_NUMBER);
@@ -228,14 +283,21 @@ void start_server(){
 
 void start_client(){
 	if(source){
+
 		string probe = "Apple";
+		Message message(probe, HOP_COUNT, SELF_IP, "", -1);
+
 		Client client(NEIGHBOR_PORT_NUMBER, NEIGHBOR_SERVER_IP);
 		client.start_connection();
-		cout<<"Client has started!"<<endl;
-		cout<<"Client has sent request awaiting response!"<<endl;
-		string response = client.send_request(probe);
-		cout<<"Response received!"<<response<<endl;
-		if(response == "Success"){
+		cout<<"[INFO] : Client has started!"<<endl;
+
+		cout<<"[INFO] : Client sending request and awaiting response!"<<endl;
+		string response = client.send_request(message);
+
+		cout<<"[INFO] : Response received!"<<response<<endl;
+		Message msg = Message::deserialize(response);
+
+		if(msg.content == "Success"){
 			cout<<"Probe successful, next steps, initiate a direct connection to the node, requires the IP of the node"<<endl;
 		}else{
 			cout<<"Probe failed, no such string exists in the system"<<endl;
@@ -245,24 +307,20 @@ void start_client(){
 
 
 int main(){
+	cout<<"[INFO] : Starting thread pool"<<endl;
+
 	vector<thread> threads;
-	cout<<"Starting thread pool"<<endl;
 	for(int i=0;i<NUM_THREADS; i++){
 		thread t(executeTask);
 		threads.push_back(move(t));
 	}
-	cout<<"Thread pool started"<<endl;
-
-	//Server server(SERVER_PORT_NUMBER, CONNECTION_NUMBER);
-	//server.start();
+	
+	cout<<"[INFO] : Thread pool initialized"<<endl;
 	
 	thread server(start_server);
-	cout<<"Server has started!"<<endl;
+	cout<<"[INFO] : Server has started!"<<endl;
 	thread client(start_client);
-	
 		
-	
-	
 	
 	for(int i=0;i<NUM_THREADS;i++){
 		threads[i].join();
@@ -270,5 +328,7 @@ int main(){
 	
 	server.join();
 	client.join();
+	
+	cout<<"[INFO] : Program terminating, all the threads completed execution!"<<endl;
     return 0;
 }
