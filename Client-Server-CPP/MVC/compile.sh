@@ -4,22 +4,20 @@ set -e
 
 echo -e "\n Compilation Phase .......\n"
 echo -e "=========================================="
-echo -e "\n Compiling Node A......\n"
-g++ mega_node_A.cpp -o NODE_A
-
-echo -e "\n Compiling Node B......\n"
-g++ mega_node_B.cpp -o NODE_B
-
-echo -e "\n Compiling Node C......\n"
-g++ mega_node_C.cpp -o NODE_C
+echo -e "\n Compiling Node ......\n"
+g++ mega_node.cpp -o NODE -pthread
 
 echo -e "\nLaunching nodes.......\n"
 echo -e "=========================================="
+
+# Arguments: <ID> <NUM_THREADS> <SERVER_IP> <SERVER_PORT_NUMBER> <CONNECTION_NUMBER> \
+#            <NEIGHBOR_SERVER_IP> <NEIGHBOR_PORT_NUMBER> <IS_SOURCE:BOOL> <SECRET> <QUERY_STRING> <HOP_COUNT>
+
 echo -e "\n Launching Node A......\n"
-./NODE_A &
+./NODE A 4 127.0.0.1 8090 5 127.0.0.1 8091 true Thor Apple 5 &
 
 echo -e "\n Launching Node B......\n"
-./NODE_B &
+./NODE B 4 127.0.0.1 8091 5 127.0.0.1 8092 false Mjnolir None 5 &
 
 echo -e "\n Launching Node C......\n"
-./NODE_C &
+./NODE C 4 127.0.0.1 8092 5 127.0.0.1 8090 false Apple None 5 &
