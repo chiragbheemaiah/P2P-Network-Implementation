@@ -49,9 +49,9 @@ for (( i=INITIAL_IP, idx=1; i<=LAST_IP; i++, idx++ )); do
   fi
 
   # Mark first container as source
-  if (( i == INITIAL_IP )); then
+  if (( i == INITIAL_IP || idx == 2)); then
     IS_SOURCE="true"
-    QUERY="Banana"
+    QUERY="Apple"
   else
     IS_SOURCE="false"
     QUERY="None"
