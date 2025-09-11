@@ -1,0 +1,63 @@
+ 
+ Number of Hop Counts - 3 
+
+Overall CPU Utilization: 0.948821
+Overall Memory Utilization: 0.0112831
+Overall Network Input Utilization: 19.869
+Overall Network Output Utilization: 20.355
+Average Response Time: 2.86
+Success Rate: 100.00%
+ 
+ Number of Hop Counts - 4 
+
+Overall CPU Utilization: 0.914316
+Overall Memory Utilization: 0.0107741
+Overall Network Input Utilization: 40.6271
+Overall Network Output Utilization: 40.1224
+Average Response Time: 4.11
+Success Rate: 100.00%
+ 
+ Number of Hop Counts - 5 
+
+Overall CPU Utilization: 0.878268
+Overall Memory Utilization: 0.0117052
+Overall Network Input Utilization: 43.1286
+Overall Network Output Utilization: 42.5991
+Average Response Time: 10.04
+Success Rate: 100.00%
+ 
+ Number of Hop Counts - 6 
+
+Overall CPU Utilization: 0.96694
+Overall Memory Utilization: 0.0105365
+Overall Network Input Utilization: 50.6589
+Overall Network Output Utilization: 51.0255
+Average Response Time: 6.45
+Success Rate: 100.00%
+ 
+ Number of Hop Counts - 7 
+
+Overall CPU Utilization: 1.38518
+Overall Memory Utilization: 0.0122025
+Overall Network Input Utilization: 34.801
+Overall Network Output Utilization: 36.8908
+Average Response Time: 11.26
+Success Rate: 100.00%
+ 
+ Number of Hop Counts - 8 
+
+Overall CPU Utilization: 1.11486
+Overall Memory Utilization: 0.0116904
+Overall Network Input Utilization: 20.648
+Overall Network Output Utilization: 23.8222
+Average Response Time: 8.29
+Success Rate: 100.00%
+ 
+ Number of Hop Counts - 9 
+
+Overall CPU Utilization: 1.11894
+Overall Memory Utilization: 0.0124552
+Overall Network Input Utilization: 47.998
+Overall Network Output Utilization: 48.1231
+Average Response Time: 8.39
+Success Rate: 100.00%

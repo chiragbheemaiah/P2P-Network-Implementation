@@ -1,0 +1,44 @@
+ 
+ Number of Threads - 1 
+
+Overall CPU Utilization: 0.78036
+Overall Memory Utilization: 0.0103389
+Overall Network Input Utilization: 29.0024
+Overall Network Output Utilization: 30.7593
+Average Response Time: 2.62
+ 
+ Number of Threads - 2 
+
+Overall CPU Utilization: 0.870111
+Overall Memory Utilization: 0.0118605
+Overall Network Input Utilization: 36.7421
+Overall Network Output Utilization: 39.5666
+Average Response Time: 4.98
+Success Rate: 100.00%
+ 
+ Number of Threads - 4 
+
+Overall CPU Utilization: 1.27911
+Overall Memory Utilization: 0.0131691
+Overall Network Input Utilization: 9.40309
+Overall Network Output Utilization: 9.60173
+Average Response Time: 9.62
+Success Rate: 100.00%
+ 
+ Number of Threads - 8 
+
+Overall CPU Utilization: 1.23916
+Overall Memory Utilization: 0.015784
+Overall Network Input Utilization: 45.2616
+Overall Network Output Utilization: 46.3725
+Average Response Time: 8.24
+Success Rate: 100.00%
+ 
+ Number of Threads - 16 
+
+Overall CPU Utilization: 1.28595
+Overall Memory Utilization: 0.0160166
+Overall Network Input Utilization: 32.2926
+Overall Network Output Utilization: 36.4338
+Average Response Time: 10.22
+Success Rate: 100.00%

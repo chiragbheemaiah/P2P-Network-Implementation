@@ -1,0 +1,72 @@
+ 
+ Number of Buyers - 2 
+
+Overall CPU Utilization: 1.63327
+Overall Memory Utilization: 0.0151547
+Overall Network Input Utilization: 57.8333
+Overall Network Output Utilization: 65.437
+Average Response Time: 8.51
+Success Rate: 100.00%
+Success Rate: 100.00%
+ 
+ Number of Buyers - 3 
+
+Overall CPU Utilization: 1.35569
+Overall Memory Utilization: 0.0126397
+Overall Network Input Utilization: 33.0345
+Overall Network Output Utilization: 34.8064
+Average Response Time: 8.42
+Success Rate: 100.00%
+ 
+ Number of Buyers - 4 
+
+Overall CPU Utilization: 1.52609
+Overall Memory Utilization: 0.0147419
+Overall Network Input Utilization: 9.97667
+Overall Network Output Utilization: 10.6897
+Average Response Time: 16.42
+Success Rate: 100.00%
+ 
+ Number of Buyers - 5 
+
+Overall CPU Utilization: 1.78549
+Overall Memory Utilization: 0.014788
+Overall Network Input Utilization: 11.1261
+Overall Network Output Utilization: 12.5061
+Average Response Time: 14.29
+Success Rate: 100.00%
+ 
+ Number of Buyers - 6 
+
+Overall CPU Utilization: 1.75033
+Overall Memory Utilization: 0.0154399
+Overall Network Input Utilization: 8.4441
+Overall Network Output Utilization: 8.44383
+Average Response Time: 9.93
+Success Rate: 100.00%
+ 
+ Number of Buyers - 7 
+
+Overall CPU Utilization: 1.28715
+Overall Memory Utilization: 0.0124513
+Overall Network Input Utilization: 6.69414
+Overall Network Output Utilization: 6.74162
+Average Response Time: 7.54
+Success Rate: 100.00%
+ 
+ Number of Buyers - 8 
+
+Overall CPU Utilization: 1.54074
+Overall Memory Utilization: 0.0159153
+Overall Network Input Utilization: 7.19691
+Overall Network Output Utilization: 8.24924
+Average Response Time: 6.94
+Success Rate: 100.00%
+ 
+ Number of Buyers - 9 
+
+Overall CPU Utilization: 0.783728
+Overall Memory Utilization: 0.0124641
+Overall Network Input Utilization: 4.57493
+Overall Network Output Utilization: 3.90942
+Average Response Time: 66127.50

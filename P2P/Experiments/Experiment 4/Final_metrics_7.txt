@@ -1,0 +1,70 @@
+Average CPU Utilization Container-1 9.04231
+Average Memory Utilization Container-1 0.0821769
+Average Network Input Container-1 607.391
+Average Network Output Container-1 650.41
+
+
+
+Average CPU Utilization Container-2 8.29897
+Average Memory Utilization Container-2 0.0946897
+Average Network Input Container-2 568.808
+Average Network Output Container-2 649.917
+
+
+
+Average CPU Utilization Container-3 9.00707
+Average Memory Utilization Container-3 0.0721429
+Average Network Input Container-3 116.353
+Average Network Output Container-3 127.326
+
+
+
+Average CPU Utilization Container-4 13.2236
+Average Memory Utilization Container-4 0.0939855
+Average Network Input Container-4 64.7191
+Average Network Output Container-4 58.8389
+
+
+
+Average CPU Utilization Container-5 11.7849
+Average Memory Utilization Container-5 0.0731343
+Average Network Input Container-5 70.8101
+Average Network Output Container-5 70.9739
+
+
+
+Average CPU Utilization Container-6 10.9195
+Average Memory Utilization Container-6 0.113182
+Average Network Input Container-6 96.4286
+Average Network Output Container-6 93.9011
+
+
+
+Average CPU Utilization Container-7 11.8648
+Average Memory Utilization Container-7 0.0919231
+Average Network Input Container-7 95.7972
+Average Network Output Container-7 123.442
+
+
+
+Average CPU Utilization Container-8 13.1742
+Average Memory Utilization Container-8 0.09696
+Average Network Input Container-8 113.591
+Average Network Output Container-8 111.17
+
+
+
+Average CPU Utilization Container-9 4.8422
+Average Memory Utilization Container-9 0.040813
+Average Network Input Container-9 397.24
+Average Network Output Container-9 392.384
+
+
+
+Average CPU Utilization Container-10 4.80534
+Average Memory Utilization Container-10 0.0951695
+Average Network Input Container-10 304.93
+Average Network Output Container-10 303.993
+
+
+

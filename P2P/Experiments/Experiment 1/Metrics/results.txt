@@ -1,0 +1,76 @@
+Average CPU Utilization Container-1 5.69068
+Average Memory Utilization Container-1 0.0737415
+Average Network Input Container-1 380.838
+Average Network Output Container-1 360.313
+
+
+
+Average CPU Utilization Container-2 6.13193
+Average Memory Utilization Container-2 0.0686897
+Average Network Input Container-2 364.962
+Average Network Output Container-2 354.623
+
+
+
+Average CPU Utilization Container-3 6.36413
+Average Memory Utilization Container-3 0.0717483
+Average Network Input Container-3 359.94
+Average Network Output Container-3 354.775
+
+
+
+Average CPU Utilization Container-4 5.40532
+Average Memory Utilization Container-4 0.0813669
+Average Network Input Container-4 374.948
+Average Network Output Container-4 360.299
+
+
+
+Average CPU Utilization Container-5 5.83007
+Average Memory Utilization Container-5 0.0719853
+Average Network Input Container-5 381.322
+Average Network Output Container-5 366.884
+
+
+
+Average CPU Utilization Container-6 6.6741
+Average Memory Utilization Container-6 0.0704478
+Average Network Input Container-6 191.918
+Average Network Output Container-6 182.918
+
+
+
+Average CPU Utilization Container-7 7.98629
+Average Memory Utilization Container-7 0.097197
+Average Network Input Container-7 203.461
+Average Network Output Container-7 182.977
+
+
+
+Average CPU Utilization Container-8 4.46703
+Average Memory Utilization Container-8 0.0914844
+Average Network Input Container-8 114.831
+Average Network Output Container-8 94.2206
+
+
+
+Average CPU Utilization Container-9 7.51168
+Average Memory Utilization Container-9 0.0792
+Average Network Input Container-9 567.908
+Average Network Output Container-9 544.526
+
+
+
+Average CPU Utilization Container-10 5.9395
+Average Memory Utilization Container-10 0.05225
+Average Network Input Container-10 671.473
+Average Network Output Container-10 673.413
+
+
+
+Average Response Time: 7.13
+Overall CPU Utilization: 0.87325
+Overall Memory Utilization: 0.0105293
+Overall Network Input Utilization: 49.474
+Overall Netowrk Output Utilization: 46.9588
+Success Rate: 100.00%
