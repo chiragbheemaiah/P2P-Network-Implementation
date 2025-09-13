@@ -60,7 +60,7 @@
       <p>The language of this world was made up of four messages. A <strong>Lookup</strong> meant a buyer was searching. A <strong>SellerReply</strong> meant someone had what was needed. A <strong>Buy</strong> was a direct purchase. An <strong>Ack</strong> sealed the deal. To stop the system from drowning in its own traffic I gave each message a hop count. At every step the hop count went down by one. If it hit zero, the message was dropped. That simple rule became the backbone of stability.</p>
 
       <figure>
-        <img alt="Hop limited flooding with reverse path replies" src="../assets/system_design.png" />
+        <img alt="Hop limited flooding with reverse path replies" src="./assets/system_design.png" />
         <figcaption>Hop limited flooding in action. Sometimes an AirPods request just has to die.</figcaption>
       </figure>
 
@@ -75,17 +75,17 @@
       <p>As buyers increased, CPU and network use spiked at first. But after a point, overlapping requests meant the cost per new buyer went down. The system got noisier but not linearly worse. Response times stayed decent until I hit extremes, when they jumped because too many buyers were after the same MacBook. Raising the hop count made requests travel farther, which of course meant more traffic and longer response times. Thread pools had a sweet spot: a few threads sped things up, but too many created overhead and lock contention.</p>
 
       <figure>
-        <img alt="Metrics vs Buyers" src="../assets/buyer_metrics_with_units_full.png" />
+        <img alt="Metrics vs Buyers" src="./assets/buyer_metrics_with_units_full.png" />
         <figcaption>With more buyers CPU and network spike, then level out. At the far end, response times rise sharply but success rate stays at 100 percent. Even for iPhones.</figcaption>
       </figure>
 
       <figure>
-        <img alt="Metrics vs Hop Count" src="../assets/hop_metrics_with_units.png" />
+        <img alt="Metrics vs Hop Count" src="./assets/hop_metrics_with_units.png" />
         <figcaption>Raising hop count increases network use and latency. TTL keeps the system from falling apart—even when the last AirPods are gone.</figcaption>
       </figure>
 
       <figure>
-        <img alt="Metrics vs Threads" src="../assets/thread_metrics_with_units.png" />
+        <img alt="Metrics vs Threads" src="./assets/thread_metrics_with_units.png" />
         <figcaption>A few threads make the system smoother. Too many threads make it clunky again. Memory rises gently with threads, just like the price of MacBooks.</figcaption>
       </figure>
 
