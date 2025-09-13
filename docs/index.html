@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>A Journey into Distributed Systems with Docker</title>
+  <meta name="description" content="A playful but detailed blog post about building a peer-to-peer system with Docker networking to learn distributed systems concepts." />
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+Pro:wght@400;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root{
+      --bg:#fdfdfd;
+      --content:#ffffff;
+      --ink:#222;
+      --muted:#666;
+      --link:#3366cc;
+      --border:#e5e5e5;
+      --code-bg:#f5f7fa;
+      --shadow:0 4px 16px rgba(0,0,0,.06);
+      --maxw: 740px;
+    }
+    body{
+      margin:0; background:var(--bg); color:var(--ink);
+      font-family:'Source Serif Pro', Georgia, serif; font-size:18px; line-height:1.7;
+    }
+    .container{max-width:var(--maxw); margin:0 auto; padding:60px 20px}
+    header{text-align:center; margin-bottom:40px}
+    h1{font-family:'Roboto',sans-serif; font-size:clamp(28px,4vw,42px); margin:0 0 12px}
+    .subtitle{color:var(--muted); font-size:20px; margin:0 auto; max-width:600px}
+    .meta{margin-top:14px; color:var(--muted); font-size:14px}
+    article{background:var(--content); padding:40px; border:1px solid var(--border); border-radius:10px; box-shadow:var(--shadow)}
+    article p{margin:20px 0}
+    h2{font-family:'Roboto',sans-serif; font-size:26px; margin-top:40px; margin-bottom:14px}
+    figure{margin:28px 0; text-align:center}
+    figure img{max-width:100%; border-radius:6px; border:1px solid var(--border); box-shadow:var(--shadow)}
+    figure figcaption{margin-top:8px; font-size:14px; color:var(--muted)}
+    pre{background:var(--code-bg); padding:14px; border-radius:8px; border:1px solid var(--border); overflow-x:auto; font-size:15px; line-height:1.5}
+    code{font-family:ui-monospace,Consolas,Monaco,monospace}
+    a{color:var(--link)}
+    a:hover{text-decoration:underline}
+    footer{margin-top:50px; padding-top:20px; border-top:1px solid var(--border); font-size:14px; color:var(--muted); text-align:center}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>A Journey into Distributed Systems with Docker</h1>
+      <p class="subtitle">How I turned containers into a quirky marketplace and learned a lot about distributed systems along the way.</p>
+      <div class="meta">By <strong>Chirag Bheemaiah PK</strong> · <time datetime="2025-09-13">September 13, 2025</time></div>
+    </header>
+
+    <article>
+      <h2>Why I started this project</h2>
+      <p>I wanted more than a hello world example to learn Docker networking. I needed something that forced me to think about how messages travel, how nodes identify each other, and what happens when too many things happen at once. That is how the idea of a small marketplace came about. It felt natural: buyers ask for something, sellers respond, and the system lives or dies on whether they can find each other in time. To make it fun, I swapped in Apple products as the goods. My containers were bartering <code>iPhones</code>, <code>MacBooks</code>, and <code>AirPods</code>. It made debugging logs a lot more entertaining: “Buyer 2 still cannot find an iPhone, forwarding to neighbor...”</p>
+
+      <h2>Designing the system</h2>
+      <p>Every container in my setup was both a buyer and a seller. To make them talk I gave each one an ID and a static IP on a custom Docker bridge. Think of it like a private LAN where I control the addresses. I wired them into a ring so that each node knew its two neighbors. The master process generated the configuration file with all this information and shared it with the containers at startup. That way every node booted up already knowing who lived to its left and right.</p>
+
+      <p>The language of this world was made up of four messages. A <strong>Lookup</strong> meant a buyer was searching. A <strong>SellerReply</strong> meant someone had what was needed. A <strong>Buy</strong> was a direct purchase. An <strong>Ack</strong> sealed the deal. To stop the system from drowning in its own traffic I gave each message a hop count. At every step the hop count went down by one. If it hit zero, the message was dropped. That simple rule became the backbone of stability.</p>
+
+      <figure>
+        <img alt="Hop limited flooding with reverse path replies" src="../assets/system_design.png" />
+        <figcaption>Hop limited flooding in action. Sometimes an AirPods request just has to die.</figcaption>
+      </figure>
+
+      <h2>The bumps along the way</h2>
+      <p>The first big bump was concurrency. A single thread could handle a trickle of requests, but once I had multiple buyers, everything stalled. I introduced a thread pool. The main thread sat in <code>accept()</code>, handed sockets to a queue, and workers picked them up. It worked, but new problems appeared. Without locks, the same message ID was processed more than once, and sellers happily sold the same MacBook twice. The fix was adding mutexes to protect the set of seen IDs and the seller inventory counter. It was one of those moments where the theory of synchronization and the reality of “negative AirPods in stock” finally clicked for me.</p>
+
+      <p>I also toyed with a reservation idea where a seller could put an item on hold for a buyer for a few seconds. That would have solved some edge cases, but for this version I left it out to keep the code easier to follow.</p>
+
+      <h2>What the experiments showed</h2>
+      <p>With the system stable enough, I wanted to see how it behaved. I measured CPU, memory, and network traffic with <code>docker stats</code>. I timed how long buyers waited. Then I dialed up the variables: more buyers, bigger hop counts, larger thread pools.</p>
+
+      <p>As buyers increased, CPU and network use spiked at first. But after a point, overlapping requests meant the cost per new buyer went down. The system got noisier but not linearly worse. Response times stayed decent until I hit extremes, when they jumped because too many buyers were after the same MacBook. Raising the hop count made requests travel farther, which of course meant more traffic and longer response times. Thread pools had a sweet spot: a few threads sped things up, but too many created overhead and lock contention.</p>
+
+      <figure>
+        <img alt="Metrics vs Buyers" src="../assets/buyer_metrics_with_units_full.png" />
+        <figcaption>With more buyers CPU and network spike, then level out. At the far end, response times rise sharply but success rate stays at 100 percent. Even for iPhones.</figcaption>
+      </figure>
+
+      <figure>
+        <img alt="Metrics vs Hop Count" src="../assets/hop_metrics_with_units.png" />
+        <figcaption>Raising hop count increases network use and latency. TTL keeps the system from falling apart—even when the last AirPods are gone.</figcaption>
+      </figure>
+
+      <figure>
+        <img alt="Metrics vs Threads" src="../assets/thread_metrics_with_units.png" />
+        <figcaption>A few threads make the system smoother. Too many threads make it clunky again. Memory rises gently with threads, just like the price of MacBooks.</figcaption>
+      </figure>
+
+      <h2>Looking back</h2>
+      <p>The results made me appreciate how even a toy project can show real distributed system behaviors. Flooding works but needs control. Concurrency helps but only in moderation. And shared state is always fragile unless you guard it. The fact that every request succeeded in all my tests gave me confidence in the core idea. The quirks, like long tails when demand spiked for iPhones, were lessons about what to improve next.</p>
+
+      <p>Running the system yourself is straightforward. Create the network, launch containers with configs, and let them gossip. For example:</p>
+      <pre><code>docker network create --subnet 192.168.100.0/24 gaul
+
+docker run -d --name node1 --network gaul --ip 192.168.100.2 \
+  -v $(pwd)/configs/1.json:/app/config.json app:latest</code></pre>
+      <p>Do that for the rest of the nodes and you will see your own tiny marketplace buzzing with trades of iPhones, MacBooks, and AirPods.</p>
+
+      <h2>Closing thoughts</h2>
+      <p>What started as a Docker networking exercise became a personal crash course in distributed systems. The hop count trick taught me how small rules keep chaos in check. The thread pool exercise reminded me that more is not always better. And debugging why a seller gave away two MacBooks they did not have made me finally respect synchronization. Build, measure, laugh a little when your logs look ridiculous, and repeat. That rhythm carried me through this project and left me with both working code and new instincts for thinking about networks.</p>
+    </article>
+
+    <footer>
+      <p>© 2025 Chirag Bheemaiah PK · Published with ❤️ on GitHub Pages</p>
+      <p><a href="https://github.com/chiragbheemaiah">View my GitHub</a> · <a href="#">Back to top</a></p>
+    </footer>
+  </div>
+</body>
+</html>
